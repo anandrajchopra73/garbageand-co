@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+:root {
+  /* Light Mode: Green & White */
+  --background: 0 0% 100%;           /* Pure white */
+  --foreground: 142 70% 15%;         /* Dark green text */
+  --card: 0 0% 100%;                 /* White cards */
+  --card-foreground: 142 70% 15%;    /* Dark green text on cards */
+  --popover: 0 0% 100%;              /* White popovers */
+  --popover-foreground: 142 70% 15%; /* Dark green text */
+  --primary: 142 76% 42%;            /* Vibrant green */
+  --primary-foreground: 0 0% 100%;   /* White text on primary */
+  --secondary: 142 30% 95%;          /* Very light green */
+  --secondary-foreground: 142 70% 20%; /* Dark green */
+  --muted: 142 20% 96%;              /* Subtle light green */
+  --muted-foreground: 142 30% 40%;   /* Muted green */
+  --accent: 142 50% 92%;             /* Light green accent */
+  --accent-foreground: 142 70% 20%;  /* Dark green */
+  --destructive: 0 84.2% 60.2%;      /* Red for errors */
+  --destructive-foreground: 0 0% 98%; /* White */
+  --border: 142 20% 85%;             /* Light green borders */
+  --input: 142 20% 90%;              /* Light green inputs */
+  --ring: 142 76% 42%;               /* Green focus ring */
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark Mode: Dark Green & Black */
+  --background: 0 0% 0%;             /* Pure black */
+  --foreground: 142 40% 85%;         /* Light green text */
+  --card: 142 15% 8%;                /* Very dark green cards */
+  --card-foreground: 142 40% 85%;    /* Light green text */
+  --popover: 142 20% 10%;            /* Dark green popovers */
+  --popover-foreground: 142 40% 85%; /* Light green text */
+  --primary: 142 70% 50%;            /* Bright green */
+  --primary-foreground: 0 0% 0%;     /* Black text on primary */
+  --secondary: 142 25% 15%;          /* Dark green secondary */
+  --secondary-foreground: 142 40% 85%; /* Light green */
+  --muted: 142 20% 12%;              /* Muted dark green */
+  --muted-foreground: 142 20% 60%;   /* Medium green */
+  --accent: 142 30% 18%;             /* Dark green accent */
+  --accent-foreground: 142 40% 85%;  /* Light green */
+  --destructive: 0 62.8% 50%;        /* Brighter red for dark mode */
+  --destructive-foreground: 0 0% 98%; /* White */
+  --border: 142 20% 20%;             /* Dark green borders */
+  --input: 142 20% 18%;              /* Dark green inputs */
+  --ring: 142 70% 50%;               /* Bright green focus ring */
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Mobile responsive utilities */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+}
+
+/* Smooth transitions for mobile menu */
+.animate-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
