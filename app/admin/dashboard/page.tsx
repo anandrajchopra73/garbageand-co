@@ -49,7 +49,8 @@ interface Complaint {
   completedAt?: string
 }
 
-export default function AdminDashboardPage() {
+export default function AdminDashboardPage()
+{
   const router = useRouter()
   const [complaints, setComplaints] = useState<Complaint[]>([])
   const [filteredComplaints, setFilteredComplaints] = useState<Complaint[]>([])
@@ -213,20 +214,56 @@ export default function AdminDashboardPage() {
       localStorage.setItem("userComplaints", JSON.stringify(updated));
       if (selectedComplaint?.id === complaintId) {
         setSelectedComplaint({ ...selectedComplaint, status: newStatus })
+      }
     }
   }
 
-  const handleWorkerAssignment = (complaintId: number, worker: string) => {
-    const updated = complaints.map(c =>
-      c.id === complaintId ? { ...c, assignedWorker: worker } : c
-    )
-    setComplaints(updated)
-    localStorage.setItem("userComplaints", JSON.stringify(updated))
-    if (selectedComplaint?.id === complaintId) {
-      setSelectedComplaint({ ...selectedComplaint, assignedWorker: worker })
+    const handleWorkerAssignment = async (complaintId: number, workerName: string) => {
+    try {
+      const worker = workers.find(w => w.name === workerName);
+      const adminId = localStorage.getItem("adminId");
+      
+      if (!worker || !adminId) {
+        console.error('Worker or admin ID not found');
+        return;
+      }
+
+      const response = await fetch(`/api/complaints/${complaintId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          workerId: parseInt(worker.id),
+          adminId: parseInt(adminId)
+        })
+      });
+
+      if (response.ok) {
+        const updated = complaints.map(c =>
+          c.id === complaintId ? { ...c, assignedWorker: workerName, status: 'assigned' } : c
+        );
+        setComplaints(updated);
+        
+        if (selectedComplaint?.id === complaintId) {
+          setSelectedComplaint({ ...selectedComplaint, assignedWorker: workerName, status: 'assigned' });
+        }
+        
+        loadComplaints();
+      }
+    } catch (error) {
+      console.error('Failed to assign worker:', error);
+      const updated = complaints.map(c =>
+        c.id === complaintId ? { ...c, assignedWorker: workerName } : c
+      );
+      setComplaints(updated);
+      localStorage.setItem("userComplaints", JSON.stringify(updated));
+      if (selectedComplaint?.id === complaintId) {
+        setSelectedComplaint({ ...selectedComplaint, assignedWorker: workerName });
+      }
     }
   }
-
+  
   const handleLogout = () => {
     localStorage.removeItem("adminEmail")
     localStorage.removeItem("isAdmin")

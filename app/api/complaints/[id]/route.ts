@@ -8,10 +8,11 @@ import {
 // GET specific complaint
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const complaintId = parseInt(params.id);
+    const { id } = await params;
+    const complaintId = parseInt(id);
     const complaint = await getComplaintById(complaintId);
 
     if (!complaint) {
@@ -37,10 +38,11 @@ export async function GET(
 // PATCH update complaint (status, assignment)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const complaintId = parseInt(params.id);
+    const { id } = await params;
+    const complaintId = parseInt(id);
     const body = await request.json();
     const { status, workerId, adminId, userId, notes } = body;
 
