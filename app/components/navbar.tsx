@@ -19,11 +19,11 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm font-bold text-white hover:text-primary transition-colors">Home</Link>
-            <Link href="/#about" className="text-sm font-bold text-white hover:text-primary transition-colors">About</Link>
-            <Link href="/worker/login" className="text-sm font-bold text-white hover:text-primary transition-colors">Worker</Link>
-            <Link href="/admin/login" className="text-sm font-bold text-white hover:text-primary transition-colors">Admin</Link>
-            <Link href="/login" className="text-sm font-bold text-white hover:text-primary transition-colors">Login</Link>
+            <Link href="/" className="text-sm font-bold text-black hover:text-primary transition-colors">Home</Link>
+            <Link href="/#about" className="text-sm font-bold text-black hover:text-primary transition-colors">About</Link>
+            <Link href="/worker/login" className="text-sm font-bold text-black hover:text-primary transition-colors">Worker</Link>
+            <Link href="/admin/login" className="text-sm font-bold text-black hover:text-primary transition-colors">Admin</Link>
+            <Link href="/login" className="text-sm font-bold text-black hover:text-primary transition-colors">Login</Link>
             <Link href="/register" className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-colors">Get Started</Link>
             <ThemeToggle />
           </div>
