@@ -36,11 +36,11 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [])
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col animate-fade-in-page">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden">
+      <section className="relative py-20 md:py-32 overflow-hidden animate-slide-up">
         {/* Background Slider */}
         <div className="absolute inset-0 w-full h-full">
           {heroSlides.map((slide, index) => (
@@ -93,13 +93,13 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-lg font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-lg font-medium text-white hover:bg-primary/90 hover:scale-105 hover:shadow-xl transition-all duration-300"
               >
                 Report Issue Now
               </Link>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 backdrop-blur-sm px-8 py-3 text-lg font-medium text-white hover:bg-white/20 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 backdrop-blur-sm px-8 py-3 text-lg font-medium text-white hover:bg-white/20 hover:scale-105 hover:shadow-xl transition-all duration-300"
               >
                 Sign In
               </Link>
@@ -109,14 +109,14 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-background">
+      <section id="about" className="py-20 bg-background animate-fade-in-section">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
-              <Trash2 className="h-12 w-12 text-primary" />
+              <Image src="/logo-old.png" alt="SmartBinX Logo" width={300} height={300} />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
-              🗑️ About SmartBinX
+               About SmartBinX
             </h2>
             <div className="space-y-4 text-lg text-muted-foreground text-center">
               <p>
@@ -141,13 +141,13 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-secondary/20">
+      <section className="py-20 bg-secondary/20 animate-fade-in-section">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             How It Works
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <UserPlus className="h-6 w-6 text-primary" />
               </div>
@@ -157,7 +157,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileText className="h-6 w-6 text-primary" />
               </div>
@@ -167,7 +167,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <LayoutDashboard className="h-6 w-6 text-primary" />
               </div>
@@ -177,7 +177,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <ClipboardList className="h-6 w-6 text-primary" />
               </div>
@@ -187,7 +187,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Truck className="h-6 w-6 text-primary" />
               </div>
@@ -197,7 +197,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4">
+            <div className="bg-card rounded-lg p-6 shadow-sm border space-y-4 hover:shadow-lg hover:scale-105 transition-all duration-300 animate-card-pop" style={{ animationDelay: '0ms' }}>
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="h-6 w-6 text-primary" />
               </div>

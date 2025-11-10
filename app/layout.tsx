@@ -18,10 +18,15 @@ export const metadata: Metadata = {
   description: "Report, Track, Transform. SmartBinX is an innovative platform designed to make waste collection efficient and transparent.",
   icons: {
     icon: [
-      { url: "/logo-old.png" },
-      { url: "/favicon.ico" },
+      { url: "/logo-old.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo-old.png", sizes: "64x64", type: "image/png" },
+      { url: "/logo-old.png", sizes: "128x128", type: "image/png" },
+      { url: "/favicon.ico", sizes: "32x32" },
     ],
     apple: [
+      { url: "/logo-old.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: [
       { url: "/logo-old.png" },
     ],
   },

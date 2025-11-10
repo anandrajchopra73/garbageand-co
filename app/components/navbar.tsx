@@ -9,11 +9,11 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur animate-slide-down">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="/logo-old.png" alt="SmartBinX Logo" width={48} height={48} className="h-12 w-12" />
+            <Image src="/logo-old.png" alt="SmartBinX Logo" width={100} height={100}/>
             <span className="text-xl font-bold">SmartBinX</span>
           </Link>
 

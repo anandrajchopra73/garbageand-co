@@ -100,3 +100,154 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+/* ===== Creative Page Animations ===== */
+
+/* Page fade-in animation */
+@keyframes fadeInPage {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-page {
+  animation: fadeInPage 0.5s ease-out;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Slide down animation for navbar */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+/* Section fade-in animation */
+@keyframes fadeInSection {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-section {
+  animation: fadeInSection 0.8s ease-out;
+}
+
+/* Card pop animation */
+@keyframes cardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-card-pop {
+  animation: cardPop 0.5s ease-out backwards;
+}
+
+/* Staggered animations for cards */
+.animate-card-pop:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.animate-card-pop:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.animate-card-pop:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.animate-card-pop:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.animate-card-pop:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.animate-card-pop:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* Smooth hover transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Button hover effect */
+a, button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+a:active, button:active {
+  transform: scale(0.98);
+}
+
+/* Floating animation for hero elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Scroll reveal animation */
+@keyframes scrollReveal {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  animation: scrollReveal 0.8s ease-out;
+}
