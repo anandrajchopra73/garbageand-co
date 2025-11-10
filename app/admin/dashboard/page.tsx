@@ -104,10 +104,42 @@ export default function AdminDashboardPage() {
     setFilteredComplaints(filtered)
   }, [complaints, filterStatus, searchQuery])
 
-  const loadComplaints = () => {
-    const stored = localStorage.getItem("userComplaints")
-    if (stored) {
-      setComplaints(JSON.parse(stored))
+  const loadComplaints = async () => {
+    try {
+      const response = await fetch('/api/complaints');
+      const result = await response.json();
+      
+      if (result.success) {
+        // Transform API data to match the component's expected format
+        const transformedComplaints = result.data.map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          description: c.description,
+          priority: c.priority,
+          location: c.location_address,
+          coordinates: c.latitude && c.longitude ? {
+            lat: parseFloat(c.latitude),
+            lng: parseFloat(c.longitude)
+          } : undefined,
+          images: c.images_data || [],
+          userEmail: c.metadata?.userEmail || c.citizen_name,
+          timestamp: c.created_at,
+          status: c.status,
+          date: new Date(c.created_at).toISOString().split('T')[0],
+          assignedWorker: c.worker_name,
+          completionImages: c.metadata?.completionImages,
+          completionNotes: c.metadata?.completionNotes,
+          completedAt: c.resolved_at
+        }));
+        setComplaints(transformedComplaints);
+      }
+    } catch (error) {
+      console.error('Failed to load complaints:', error);
+      // Fallback to localStorage if API fails
+      const stored = localStorage.getItem("userComplaints");
+      if (stored) {
+        setComplaints(JSON.parse(stored));
+      }
     }
   }
 
@@ -140,14 +172,47 @@ export default function AdminDashboardPage() {
     return styles[priority as keyof typeof styles] || styles.medium
   }
 
-  const handleStatusUpdate = (complaintId: number, newStatus: string) => {
-    const updated = complaints.map(c =>
-      c.id === complaintId ? { ...c, status: newStatus } : c
-    )
-    setComplaints(updated)
-    localStorage.setItem("userComplaints", JSON.stringify(updated))
-    if (selectedComplaint?.id === complaintId) {
-      setSelectedComplaint({ ...selectedComplaint, status: newStatus })
+  const handleStatusUpdate = async (complaintId: number, newStatus: string) => {
+    try {
+      // Get admin user ID from localStorage
+      const userId = localStorage.getItem("userId");
+      
+      const response = await fetch(`/api/complaints/${complaintId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          userId: parseInt(userId || '0'),
+          notes: `Status updated to ${newStatus} by admin`
+        })
+      });
+
+      if (response.ok) {
+        // Update local state
+        const updated = complaints.map(c =>
+          c.id === complaintId ? { ...c, status: newStatus } : c
+        );
+        setComplaints(updated);
+        
+        if (selectedComplaint?.id === complaintId) {
+          setSelectedComplaint({ ...selectedComplaint, status: newStatus });
+        }
+        
+        // Reload complaints to get fresh data
+        loadComplaints();
+      }
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      // Fallback to localStorage
+      const updated = complaints.map(c =>
+        c.id === complaintId ? { ...c, status: newStatus } : c
+      );
+      setComplaints(updated);
+      localStorage.setItem("userComplaints", JSON.stringify(updated));
+      if (selectedComplaint?.id === complaintId) {
+        setSelectedComplaint({ ...selectedComplaint, status: newStatus })
     }
   }
 

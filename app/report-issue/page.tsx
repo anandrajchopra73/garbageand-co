@@ -145,42 +145,62 @@ export default function ReportIssuePage() {
       return
     }
 
-    setSubmitting(true)
+    setSubmitting(true);
 
     try {
-      // Simulate API call - Replace with your actual backend API
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Get citizen ID from localStorage (set during login/registration)
+      const citizenId = localStorage.getItem("citizenId");
       
-      // In production, you would:
-      // 1. Upload images to cloud storage (S3, Cloudinary, etc.)
-      // 2. Send complaint data to your backend API
-      // 3. Save to database
-      
+      if (!citizenId) {
+        setError("User session expired. Please login again.");
+        router.push("/login");
+        return;
+      }
+
+      // Convert images to base64
+      const imagesData = await Promise.all(
+        images.map(async (file) => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+
+      // Prepare complaint data
       const complaintData = {
+        citizenId: parseInt(citizenId),
         title,
         description,
+        locationAddress: location.address,
+        latitude: location.latitude,
+        longitude: location.longitude,
         priority,
-        location: location.address,
-        coordinates: {
-          lat: location.latitude,
-          lng: location.longitude,
+        imagesData,
+        metadata: {
+          userEmail,
+          deviceInfo: navigator.userAgent,
+          submittedAt: new Date().toISOString(),
         },
-        images: images.map(img => img.name),
-        userEmail,
-        timestamp: new Date().toISOString(),
+      };
+
+      // Submit to API
+      const response = await fetch("/api/complaints", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(complaintData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to submit complaint");
       }
-      
-      console.log("Complaint submitted:", complaintData)
-      
-      // Store in localStorage for demo (in production, this comes from your backend)
-      const existingComplaints = JSON.parse(localStorage.getItem("userComplaints") || "[]")
-      existingComplaints.push({
-        id: Date.now(),
-        ...complaintData,
-        status: "pending",
-        date: new Date().toISOString().split('T')[0],
-      })
-      localStorage.setItem("userComplaints", JSON.stringify(existingComplaints))
+
+      console.log("Complaint submitted successfully:", result.data);
       
       setSubmitSuccess(true)
       
