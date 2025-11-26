@@ -78,9 +78,19 @@ export default function AdminDashboardPage()
 
   const loadWorkers = async () => {
     try {
-      const response = await fetch('/workers.json')
-      const data = await response.json()
-      setWorkers(data)
+      const response = await fetch('/api/workers')
+      const result = await response.json()
+      if (result.success) {
+        // Transform API data to match component interface
+        const transformedWorkers = result.data.map((w: any) => ({
+          id: w.id.toString(),
+          name: w.full_name,
+          phone: w.phone,
+          email: w.email,
+          status: w.status
+        }))
+        setWorkers(transformedWorkers)
+      }
     } catch (err) {
       console.error('Failed to load workers:', err)
     }
@@ -659,7 +669,7 @@ export default function AdminDashboardPage()
                     <option value="">Select Worker</option>
                     {workers.length > 0 ? (
                       workers.map(worker => (
-                        <option key={worker.id} value={worker.id}>
+                        <option key={worker.id} value={worker.name}>
                           {worker.name} ({worker.id}) - {worker.phone}
                         </option>
                       ))

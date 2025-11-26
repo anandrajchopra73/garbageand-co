@@ -44,14 +44,14 @@ export async function PATCH(
     const { id } = await params;
     const complaintId = parseInt(id);
     const body = await request.json();
-    const { status, workerId, adminId, userId, notes } = body;
+    const { status, workerId, adminId, userId, notes, metadata } = body;
 
     if (workerId && adminId) {
       // Assign to worker
       await assignComplaintToWorker(complaintId, workerId, adminId);
     } else if (status && userId) {
-      // Update status
-      await updateComplaintStatus(complaintId, status, userId, notes);
+      // Update status with optional metadata
+      await updateComplaintStatus(complaintId, status, userId, notes, metadata);
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid update parameters' },

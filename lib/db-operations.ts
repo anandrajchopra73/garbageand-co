@@ -423,7 +423,8 @@ export async function updateComplaintStatus(
   complaintId: number,
   status: string,
   userId: number,
-  notes?: string
+  notes?: string,
+  metadata?: any
 ) {
   const client = await getClient();
   try {
@@ -434,15 +435,25 @@ export async function updateComplaintStatus(
       updates.resolved_at = new Date();
     }
 
-    await client.query(
-      `UPDATE complaints SET status = $1, resolved_at = $2 WHERE id = $3`,
-      [status, updates.resolved_at || null, complaintId]
-    );
+    // Handle metadata update if provided
+    let metadataQuery = 'UPDATE complaints SET status = $1, resolved_at = $2 WHERE id = $3';
+    let metadataParams = [status, updates.resolved_at || null, complaintId];
+    
+    if (metadata) {
+      const compressedMetadata = await compressData(metadata);
+      metadataQuery = 'UPDATE complaints SET status = $1, resolved_at = $2, metadata = $4 WHERE id = $3';
+      metadataParams = [status, updates.resolved_at || null, complaintId, compressedMetadata];
+    }
+
+    await client.query(metadataQuery, metadataParams);
+
+    // Compress metadata for history if provided
+    const compressedHistoryMetadata = metadata ? await compressData(metadata) : null;
 
     await client.query(
-      `INSERT INTO complaint_status_history (complaint_id, status, changed_by_user_id, notes) 
-       VALUES ($1, $2, $3, $4)`,
-      [complaintId, status, userId, notes]
+      `INSERT INTO complaint_status_history (complaint_id, status, changed_by_user_id, notes, metadata) 
+       VALUES ($1, $2, $3, $4, $5)`,
+      [complaintId, status, userId, notes, compressedHistoryMetadata]
     );
 
     await client.query('COMMIT');

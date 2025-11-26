@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createComplaint, getAllComplaints } from '@/lib/db-operations';
+import { createComplaint, getAllComplaints, getComplaintsByWorkerId } from '@/lib/db-operations';
 
 // GET all complaints
 export async function GET(request: NextRequest) {
@@ -9,6 +9,17 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority');
     const limit = searchParams.get('limit');
     const offset = searchParams.get('offset');
+    const workerId = searchParams.get('workerId');
+
+    // If workerId is provided, get complaints for specific worker
+    if (workerId) {
+      const complaints = await getComplaintsByWorkerId(parseInt(workerId));
+      return NextResponse.json({
+        success: true,
+        data: complaints,
+        count: complaints.length
+      });
+    }
 
     const filters = {
       status: status || undefined,

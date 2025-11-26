@@ -69,13 +69,53 @@ export default function WorkerDashboardPage() {
     loadMyTasks(id)
   }, [])
 
-  const loadMyTasks = (id: string) => {
-    const stored = localStorage.getItem("userComplaints")
-    if (stored) {
-      const allComplaints: Complaint[] = JSON.parse(stored)
-      // Filter tasks assigned to this worker
-      const assigned = allComplaints.filter(c => c.assignedWorker === id)
-      setMyTasks(assigned)
+  const loadMyTasks = async (id: string) => {
+    try {
+      // First try to get tasks from API
+      const response = await fetch(`/api/complaints?workerId=${id}`)
+      const result = await response.json()
+      
+      if (result.success) {
+        // Transform API data to match component format
+        const transformedTasks = result.data.map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          description: c.description,
+          priority: c.priority,
+          location: c.location_address,
+          coordinates: c.latitude && c.longitude ? {
+            lat: parseFloat(c.latitude),
+            lng: parseFloat(c.longitude)
+          } : undefined,
+          images: c.images_data || [],
+          userEmail: c.metadata?.userEmail || c.citizen_name,
+          timestamp: c.created_at,
+          status: c.status,
+          date: new Date(c.created_at).toISOString().split('T')[0],
+          assignedWorker: c.worker_name,
+          completionImages: c.metadata?.completionImages,
+          completionNotes: c.metadata?.completionNotes,
+          completedAt: c.resolved_at
+        }))
+        setMyTasks(transformedTasks)
+      } else {
+        // Fallback to localStorage
+        const stored = localStorage.getItem("userComplaints")
+        if (stored) {
+          const allComplaints: Complaint[] = JSON.parse(stored)
+          const assigned = allComplaints.filter(c => c.assignedWorker === id)
+          setMyTasks(assigned)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load tasks from API:', error)
+      // Fallback to localStorage
+      const stored = localStorage.getItem("userComplaints")
+      if (stored) {
+        const allComplaints: Complaint[] = JSON.parse(stored)
+        const assigned = allComplaints.filter(c => c.assignedWorker === id)
+        setMyTasks(assigned)
+      }
     }
   }
 
@@ -114,10 +154,54 @@ export default function WorkerDashboardPage() {
     setSubmitting(true)
 
     try {
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Get worker user ID from localStorage
+      const userId = localStorage.getItem("userId")
+      
+      if (!userId) {
+        alert("Session expired. Please login again.")
+        router.push("/worker/login")
+        return
+      }
 
-      // Update the complaint with completion data
+      // Prepare completion metadata
+      const completionMetadata = {
+        completionImages: completionImages.map(img => img.name),
+        completionNotes,
+        completedBy: workerId,
+        completedAt: new Date().toISOString()
+      }
+
+      // Update complaint status via API
+      const response = await fetch(`/api/complaints/${selectedTask.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'resolved',
+          userId: parseInt(userId),
+          notes: `Task completed by worker ${workerName}. ${completionNotes}`,
+          metadata: completionMetadata
+        })
+      })
+
+      if (response.ok) {
+        // Refresh tasks from API
+        await loadMyTasks(workerId)
+        
+        // Reset form
+        setSelectedTask(null)
+        setCompletionImages([])
+        setCompletionPreviews([])
+        setCompletionNotes("")
+        
+        alert("Task completed successfully!")
+      } else {
+        throw new Error('Failed to update complaint status')
+      }
+    } catch (err) {
+      console.error('Failed to complete task:', err)
+      // Fallback to localStorage
       const stored = localStorage.getItem("userComplaints")
       if (stored) {
         const allComplaints: Complaint[] = JSON.parse(stored)
@@ -135,20 +219,15 @@ export default function WorkerDashboardPage() {
         })
         
         localStorage.setItem("userComplaints", JSON.stringify(updated))
-        
-        // Refresh tasks
         loadMyTasks(workerId)
         
-        // Reset form
         setSelectedTask(null)
         setCompletionImages([])
         setCompletionPreviews([])
         setCompletionNotes("")
         
-        alert("Task completed successfully!")
+        alert("Task completed successfully (offline mode)!")
       }
-    } catch (err) {
-      alert("Failed to complete task. Please try again.")
     } finally {
       setSubmitting(false)
     }
