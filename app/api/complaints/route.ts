@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       const complaints = await getComplaintsByWorkerId(parseInt(workerId));
       return NextResponse.json({
         success: true,
-        data: complaints,
-        count: complaints.length
+        data: complaints || [],
+        count: complaints?.length || 0
       });
     }
 
@@ -32,13 +32,18 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: complaints,
-      count: complaints.length
+      data: complaints || [],
+      count: complaints?.length || 0
     });
   } catch (error) {
     console.error('Error fetching complaints:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch complaints' },
+      { 
+        success: false, 
+        error: 'Database connection failed',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }

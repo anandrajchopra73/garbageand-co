@@ -120,7 +120,7 @@ export default function AdminDashboardPage()
       const response = await fetch('/api/complaints');
       const result = await response.json();
       
-      if (result.success) {
+      if (result.success && result.data) {
         // Transform API data to match the component's expected format
         const transformedComplaints = result.data.map((c: any) => ({
           id: c.id,
@@ -143,13 +143,23 @@ export default function AdminDashboardPage()
           completedAt: c.resolved_at
         }));
         setComplaints(transformedComplaints);
+      } else {
+        console.warn('API returned no data or failed:', result);
+        setComplaints([]);
       }
     } catch (error) {
       console.error('Failed to load complaints:', error);
       // Fallback to localStorage if API fails
       const stored = localStorage.getItem("userComplaints");
       if (stored) {
-        setComplaints(JSON.parse(stored));
+        try {
+          setComplaints(JSON.parse(stored));
+        } catch (parseError) {
+          console.error('Failed to parse stored complaints:', parseError);
+          setComplaints([]);
+        }
+      } else {
+        setComplaints([]);
       }
     }
   }

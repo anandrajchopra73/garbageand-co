@@ -302,28 +302,43 @@ export async function getComplaintsByCitizenId(citizenId: number) {
 }
 
 export async function getComplaintsByWorkerId(workerId: number) {
-  const result = await query(
-    `SELECT c.*, cit.full_name as citizen_name, cit.phone as citizen_phone
-     FROM complaints c
-     JOIN citizens cit ON c.citizen_id = cit.id
-     WHERE c.assigned_worker_id = $1
-     ORDER BY c.created_at DESC`,
-    [workerId]
-  );
+  try {
+    const result = await query(
+      `SELECT c.*, cit.full_name as citizen_name, cit.phone as citizen_phone
+       FROM complaints c
+       JOIN citizens cit ON c.citizen_id = cit.id
+       WHERE c.assigned_worker_id = $1
+       ORDER BY c.created_at DESC`,
+      [workerId]
+    );
 
-  const complaints = await Promise.all(
-    result.rows.map(async (complaint) => {
-      if (complaint.images_data) {
-        complaint.images_data = await decompressData(complaint.images_data);
-      }
-      if (complaint.metadata) {
-        complaint.metadata = await decompressData(complaint.metadata);
-      }
-      return complaint;
-    })
-  );
+    if (!result.rows || result.rows.length === 0) {
+      return [];
+    }
 
-  return complaints;
+    const complaints = await Promise.all(
+      result.rows.map(async (complaint) => {
+        try {
+          if (complaint.images_data) {
+            complaint.images_data = await decompressData(complaint.images_data);
+          }
+          if (complaint.metadata) {
+            complaint.metadata = await decompressData(complaint.metadata);
+          }
+        } catch (decompressError) {
+          console.warn('Failed to decompress data for complaint', complaint.id, decompressError);
+          complaint.images_data = null;
+          complaint.metadata = null;
+        }
+        return complaint;
+      })
+    );
+
+    return complaints;
+  } catch (error) {
+    console.error('Error in getComplaintsByWorkerId:', error);
+    return [];
+  }
 }
 
 export async function getAllComplaints(filters?: {
@@ -332,59 +347,74 @@ export async function getAllComplaints(filters?: {
   limit?: number;
   offset?: number;
 }) {
-  let queryText = `
-    SELECT c.*, 
-    cit.full_name as citizen_name,
-    w.full_name as worker_name
-    FROM complaints c
-    LEFT JOIN citizens cit ON c.citizen_id = cit.id
-    LEFT JOIN workers w ON c.assigned_worker_id = w.id
-    WHERE 1=1
-  `;
-  
-  const params: any[] = [];
-  let paramCount = 1;
+  try {
+    let queryText = `
+      SELECT c.*, 
+      cit.full_name as citizen_name,
+      w.full_name as worker_name
+      FROM complaints c
+      LEFT JOIN citizens cit ON c.citizen_id = cit.id
+      LEFT JOIN workers w ON c.assigned_worker_id = w.id
+      WHERE 1=1
+    `;
+    
+    const params: any[] = [];
+    let paramCount = 1;
 
-  if (filters?.status) {
-    queryText += ` AND c.status = $${paramCount}`;
-    params.push(filters.status);
-    paramCount++;
+    if (filters?.status) {
+      queryText += ` AND c.status = $${paramCount}`;
+      params.push(filters.status);
+      paramCount++;
+    }
+
+    if (filters?.priority) {
+      queryText += ` AND c.priority = $${paramCount}`;
+      params.push(filters.priority);
+      paramCount++;
+    }
+
+    queryText += ` ORDER BY c.created_at DESC`;
+
+    if (filters?.limit) {
+      queryText += ` LIMIT $${paramCount}`;
+      params.push(filters.limit);
+      paramCount++;
+    }
+
+    if (filters?.offset) {
+      queryText += ` OFFSET $${paramCount}`;
+      params.push(filters.offset);
+    }
+
+    const result = await query(queryText, params);
+
+    if (!result.rows || result.rows.length === 0) {
+      return [];
+    }
+
+    const complaints = await Promise.all(
+      result.rows.map(async (complaint) => {
+        try {
+          if (complaint.images_data) {
+            complaint.images_data = await decompressData(complaint.images_data);
+          }
+          if (complaint.metadata) {
+            complaint.metadata = await decompressData(complaint.metadata);
+          }
+        } catch (decompressError) {
+          console.warn('Failed to decompress data for complaint', complaint.id, decompressError);
+          complaint.images_data = null;
+          complaint.metadata = null;
+        }
+        return complaint;
+      })
+    );
+
+    return complaints;
+  } catch (error) {
+    console.error('Error in getAllComplaints:', error);
+    return [];
   }
-
-  if (filters?.priority) {
-    queryText += ` AND c.priority = $${paramCount}`;
-    params.push(filters.priority);
-    paramCount++;
-  }
-
-  queryText += ` ORDER BY c.created_at DESC`;
-
-  if (filters?.limit) {
-    queryText += ` LIMIT $${paramCount}`;
-    params.push(filters.limit);
-    paramCount++;
-  }
-
-  if (filters?.offset) {
-    queryText += ` OFFSET $${paramCount}`;
-    params.push(filters.offset);
-  }
-
-  const result = await query(queryText, params);
-
-  const complaints = await Promise.all(
-    result.rows.map(async (complaint) => {
-      if (complaint.images_data) {
-        complaint.images_data = await decompressData(complaint.images_data);
-      }
-      if (complaint.metadata) {
-        complaint.metadata = await decompressData(complaint.metadata);
-      }
-      return complaint;
-    })
-  );
-
-  return complaints;
 }
 
 export async function assignComplaintToWorker(
